@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NannyConnect - Find Trusted Nannies</title>
+    <style>
+        /* Login Styles */
+        .login-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .login-box {
+            background: white;
+            padding: 2.5rem;
+            border-radius: 15px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.3);
+            text-align: center;
+            max-width: 400px;
+            width: 90%;
+        }
+
+        .login-logo {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .login-input {
+            width: 100%;
+            padding: 14px;
+            margin: 12px 0;
+            border: 2px solid #e1e1e1;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+        }
+
+        .login-input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .login-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 14px 30px;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 1rem;
+            transition: transform 0.2s ease;
+        }
+
+        .login-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .login-tabs {
+            display: flex;
+            margin-bottom: 1.5rem;
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 5px;
+        }
+
+        .login-tab {
+            flex: 1;
+            padding: 12px;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .login-tab.active {
+            background: white;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        /* Your existing styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: #f5f5f5;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 2rem 0;
+            text-align: center;
+            border-radius: 0 0 20px 20px;
+            margin-bottom: 2rem;
+            position: relative;
+        }
+        
+        .logo {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+        
+        .tagline {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+        
+        .card {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+        }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: #555;
+        }
+        
+        input, select, textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e1e1e1;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+        }
+        
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+            width: 100%;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+        
+        .nanny-card {
+            background: white;
+            border-radius: 10px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            border-left: 4px solid #667eea;
+            margin: 10px 0;
+        }
+        
+        .user-welcome {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            text-align: right;
+            color: white;
+        }
+        
+        .logout-btn {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: 1px solid white;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 5px;
+            transition: background 0.3s ease;
+        }
+        
+        .logout-btn:hover {
+            background: rgba(255,255,255,0.3);
+        }
+        
+        .alert {
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+        }
+        
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+    </style>
+</head>
+<body>
+    <!-- LOGIN SCREEN -->
+    <div id="loginOverlay" class="login-overlay">
+        <div class="login-box">
+            <div class="login-logo">👶</div>
+            <h2>Welcome to NannyConnect</h2>
+            <p style="color: #666; margin-bottom: 1.5rem;">Sign in to book trusted nannies</p>
+            
+            <div class="login-tabs">
+                <div class="login-tab active" onclick="showLoginForm()">Login</div>
+                <div class="login-tab" onclick="showRegisterForm()">Register</div>
+            </div>
+            
+            <!-- Login Form -->
+            <div id="loginForm">
+                <input type="email" id="loginEmail" class="login-input" placeholder="Email address" autocomplete="email">
+                <input type="password" id="loginPassword" class="login-input" placeholder="Password" autocomplete="current-password">
+                <button onclick="login()" class="login-btn">Sign In</button>
+            </div>
+            
+            <!-- Register Form (Hidden by default) -->
+            <div id="registerForm" class="hidden">
+                <input type="text" id="registerName" class="login-input" placeholder="Full Name">
+                <input type="email" id="registerEmail" class="login-input" placeholder="Email address">
+                <input type="password" id="registerPassword" class="login-input" placeholder="Create Password">
+                <button onclick="register()" class="login-btn">Create Account</button>
+                <p style="font-size: 0.9rem; color: #666; margin-top: 1rem;">Contact admin to activate your account</p>
+            </div>
+            
+            <div id="loginError" class="alert alert-error" style="display: none; margin-top: 1rem;"></div>
+            
+            <div style="margin-top: 2rem; padding-top: 1rem; border-top: 1px solid #eee;">
+                <p style="font-size: 0.9rem; color: #666;">
+                    Demo Accounts:<br>
+                    <strong>parent@test.com</strong> / parent123<br>
+                    <strong>admin@test.com</strong> / admin123
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- MAIN APP CONTENT -->
+    <div id="mainApp" class="hidden">
+        <header>
+            <div class="container">
+                <div class="logo">👶 NannyConnect</div>
+                <div class="tagline">Find trusted nannies in your area</div>
+                <div class="user-welcome">
+                    Welcome, <span id="userName">User</span>!
+                    <button onclick="logout()" class="logout-btn">Logout</button>
+                </div>
+            </div>
+        </header>
+
+        <div class="container">
+            <!-- Request Form -->
+            <div class="card">
+                <h2>Request a Nanny</h2>
+                <div id="alert"></div>
+                
+                <form id="request-form">
+                    <div class="form-group">
+                        <label for="parentName">Your Name</label>
+                        <input type="text" id="parentName" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="parentPhone">Phone Number</label>
+                        <input type="tel" id="parentPhone" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="area">Your Area/Suburb</label>
+                        <input type="text" id="area" required placeholder="e.g., Area 3, Lilongwe">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="date">Date Needed</label>
+                        <input type="date" id="date" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="time">Time Needed</label>
+                        <input type="time" id="time" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="notes">Special Notes (optional)</label>
+                        <textarea id="notes" rows="3" placeholder="Number of children, ages, any special requirements..."></textarea>
+                    </div>
+                    
+                    <button type="submit" class="btn">Submit Request</button>
+                </form>
+            </div>
+
+            <!-- Available Nannies -->
+            <div class="card">
+                <h2>Our Available Nannies</h2>
+                <p style="color: #666; margin-bottom: 1rem;">Browse our verified nannies</p>
+                <div id="nanny-list">
+                    <div style="text-align: center; padding: 2rem; color: #666;">Loading nannies...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'https://script.google.com/macros/s/AKfycbzdjHodAXL9yUh5834T7vcLYHgLAjRy_mVhAR5r6ofJl3WKTy44BQodDGEWAD1hMgdR/exec';
+
+        // Login System
+        function showLoginForm() {
+            document.getElementById('loginForm').classList.remove('hidden');
+            document.getElementById('registerForm').classList.add('hidden');
+            document.querySelectorAll('.login-tab').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.login-tab')[0].classList.add('active');
+        }
+
+        function showRegisterForm() {
+            document.getElementById('loginForm').classList.add('hidden');
+            document.getElementById('registerForm').classList.remove('hidden');
+            document.querySelectorAll('.login-tab').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.login-tab')[1].classList.add('active');
+        }
+
+        async function login() {
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            const errorElement = document.getElementById('loginError');
+
+            if (!email || !password) {
+                showLoginError('Please enter both email and password');
+                return;
+            }
+
+            try {
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        action: 'loginUser',
+                        email: email,
+                        password: password
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    // Store user data indefinitely
+                    localStorage.setItem('nannyconnect_user', JSON.stringify(result.user));
+                    localStorage.setItem('nannyconnect_token', result.user.token);
+                    showMainApp(result.user);
+                } else {
+                    showLoginError(result.error || 'Login failed');
+                }
+            } catch (error) {
+                showLoginError('Network error. Please try again.');
+            }
+        }
+
+        function register() {
+            const name = document.getElementById('registerName').value;
+            const email = document.getElementById('registerEmail').value;
+            const password = document.getElementById('registerPassword').value;
+
+            if (!name || !email || !password) {
+                showLoginError('Please fill all fields');
+                return;
+            }
+
+            showLoginError('Registration feature coming soon! Contact admin to create your account.');
+        }
+
+        function showLoginError(message) {
+            const errorElement = document.getElementById('loginError');
+            errorElement.textContent = message;
+            errorElement.style.display = 'block';
+        }
+
+        function showMainApp(user) {
+            document.getElementById('loginOverlay').style.display = 'none';
+            document.getElementById('mainApp').classList.remove('hidden');
+            document.getElementById('userName').textContent = user.name;
+            loadNannies();
+        }
+
+        async function verifyToken(token) {
+            try {
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        action: 'verifyToken',
+                        token: token
+                    })
+                });
+                return await response.json();
+            } catch (error) {
+                return { success: false };
+            }
+        }
+
+        async function checkExistingLogin() {
+            const storedToken = localStorage.getItem('nannyconnect_token');
+            const storedUser = localStorage.getItem('nannyconnect_user');
+            
+            if (storedToken && storedUser) {
+                const verification = await verifyToken(storedToken);
+                if (verification.success) {
+                    showMainApp(JSON.parse(storedUser));
+                    return;
+                }
+            }
+            // If no valid token, show login
+            document.getElementById('loginOverlay').style.display = 'flex';
+        }
+
+        function logout() {
+            localStorage.removeItem('nannyconnect_user');
+            localStorage.removeItem('nannyconnect_token');
+            document.getElementById('mainApp').classList.add('hidden');
+            document.getElementById('loginOverlay').style.display = 'flex';
+            document.getElementById('loginEmail').value = '';
+            document.getElementById('loginPassword').value = '';
+            document.getElementById('loginError').style.display = 'none';
+            showLoginForm();
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            checkExistingLogin();
+            const today = new Date().toISOString().split('T')[0];
+            if(document.getElementById('date')) {
+                document.getElementById('date').min = today;
+            }
+        });
+
+        // Your existing nanny loading and form submission code
+        async function loadNannies() {
+            try {
+                const response = await fetch(`${API_URL}?action=getNannies`);
+                const data = await response.json();
+                
+                const container = document.getElementById("nanny-list");
+                container.innerHTML = "";
+
+                if (!data.success || !data.nannies || data.nannies.length === 0) {
+                    container.innerHTML = `
+                        <div style="text-align: center; padding: 3rem; color: #666;">
+                            <h3>No available nannies at the moment</h3>
+                            <p>Please submit a request and we'll find a nanny for you!</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                data.nannies.forEach(n => {
+                    const card = document.createElement('div');
+                    card.className = 'nanny-card';
+                    card.innerHTML = `
+                        <div style="font-size: 1.3rem; font-weight: bold; color: #333; margin-bottom: 1rem;">${n.name || 'Nanny'}</div>
+                        <div style="margin-bottom: 0.8rem; color: #666;">
+                            <span>📞</span>
+                            <span>${n.phone ? '0' + n.phone : 'Phone not provided'}</span>
+                        </div>
+                        <div style="margin-bottom: 0.8rem; color: #666;">
+                            <span>📍</span>
+                            <span>${n.area || 'Area not specified'}</span>
+                        </div>
+                        <div style="margin-bottom: 0.8rem; color: #666;">
+                            <span>⭐</span>
+                            <span>${n.rating || 'No ratings yet'}</span>
+                        </div>
+                        ${n.experience ? `
+                        <div style="margin-bottom: 0.8rem; color: #666;">
+                            <span>🎓</span>
+                            <span>${n.experience}</span>
+                        </div>
+                        ` : ''}
+                        <div style="background: ${n.verified === 'Yes' ? '#27ae60' : '#e74c3c'}; color: white; padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; display: inline-block; font-weight: bold;">
+                            ${n.verified === 'Yes' ? '✅ VERIFIED' : '❌ NOT VERIFIED'}
+                        </div>
+                    `;
+                    container.appendChild(card);
+                });
+            } catch (error) {
+                document.getElementById("nanny-list").innerHTML = `
+                    <div style="text-align: center; padding: 3rem; color: #666;">
+                        <h3>Error loading nannies</h3>
+                        <p>Please check your connection and try again.</p>
+                    </div>
+                `;
+            }
+        }
+
+        // Form submission
+        document.getElementById('request-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const submitBtn = e.target.querySelector('button');
+            const originalText = submitBtn.textContent;
+            submitBtn.textContent = 'Submitting...';
+            submitBtn.disabled = true;
+            
+            const requestData = {
+                action: 'createRequest',
+                parentName: document.getElementById('parentName').value,
+                parentPhone: document.getElementById('parentPhone').value,
+                area: document.getElementById('area').value,
+                date: document.getElementById('date').value,
+                time: document.getElementById('time').value,
+                notes: document.getElementById('notes').value
+            };
+            
+            try {
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    body: JSON.stringify(requestData)
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    showAlert(result.message || 'Request submitted successfully! We will contact you shortly.', 'success');
+                    document.getElementById('request-form').reset();
+                } else {
+                    showAlert('Error: ' + (result.error || 'Failed to submit request'), 'error');
+                }
+            } catch (error) {
+                showAlert('Network error. Please check your connection and try again.', 'error');
+            } finally {
+                submitBtn.textContent = originalText;
+                submitBtn.disabled = false;
+            }
+        });
+
+        function showAlert(message, type) {
+            const alertDiv = document.getElementById('alert');
+            alertDiv.innerHTML = `
+                <div class="alert alert-${type}">${message}</div>
+            `;
+            setTimeout(() => {
+                alertDiv.innerHTML = '';
+            }, 10000);
+        }
+    </script>
+</body>
+</html>
